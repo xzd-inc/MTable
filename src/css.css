@@ -131,3 +131,6 @@
   --input-large-font-size: calc(var(--font-size) + 2px);
   --input-gap-border: #e4e0e7;
 }
+* {
+  box-sizing: border-box;
+}

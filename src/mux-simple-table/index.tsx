@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState, CSSProperties } from 'react'
 import ResizeObserver from 'rc-resize-observer'
 import get from 'lodash/get'
 
@@ -128,6 +128,9 @@ export default function MuxSimpleTable(props: IProps) {
     if (yEndIndex === undefined) {
       yEndIndex = sizes.y.length
     }
+    if (yStartIndex === undefined) {
+      yStartIndex = 0
+    }
 
     setYIndex({ yStartIndex, yEndIndex })
   }, [innerHeight, sizes.y])
@@ -164,6 +167,10 @@ export default function MuxSimpleTable(props: IProps) {
       xEndIndex = sizes.x.length
     }
 
+    if (xStartIndex === undefined) {
+      xStartIndex = 0
+    }
+
     setXIndex({ xStartIndex, xEndIndex })
   }, [innerWidth, sizes.x])
 
@@ -185,9 +192,9 @@ export default function MuxSimpleTable(props: IProps) {
     }
 
     let isPending = false
-    let event
+    let event: any
 
-    function onWheel(e) {
+    function onWheel(this: HTMLDivElement, e: WheelEvent) {
       hoverContentRef.current = 'body'
       event = e
       e.preventDefault()
@@ -200,15 +207,23 @@ export default function MuxSimpleTable(props: IProps) {
 
         const lastScrollTop = this.scrollTop
         this.scrollTop += event.deltaY
-        rightScrollbarDomRef.current.scrollTop = this.scrollTop
+
+        if (rightScrollbarDomRef.current) {
+          rightScrollbarDomRef.current.scrollTop = this.scrollTop
+        }
+
         if (lastScrollTop !== this.scrollTop) {
           setYIndexHandler(this.scrollTop)
         }
 
         const lastScrollLeft = this.scrollLeft
         this.scrollLeft += event.deltaX
-        headerDomRef.current.scrollLeft = this.scrollLeft
-        bottomScrollbarDomRef.current.scrollTop = this.scrollLeft
+        if (headerDomRef.current) {
+          headerDomRef.current.scrollLeft = this.scrollLeft
+        }
+        if (bottomScrollbarDomRef.current) {
+          bottomScrollbarDomRef.current.scrollTop = this.scrollLeft
+        }
         if (lastScrollLeft !== this.scrollLeft) {
           setXIndexHandler(this.scrollLeft)
         }
@@ -242,65 +257,58 @@ export default function MuxSimpleTable(props: IProps) {
   }, [innerColumns, xStartIndex, xEndIndex])
 
   const translateX = useMemo(() => {
-    const translateX = sizes.x[xStartIndex]?.leftOffset || 0
-    return translateX - 600 < 0 ? 0 : translateX - 600
+    return sizes.x[xStartIndex]?.leftOffset || 0
   }, [xStartIndex])
+
+  const flexGrow = totalWidth < innerWidth ? 1 : 0
 
   return (
     <div className="mux-simple-table">
       {/* 表头 */}
       <div className="mux-simple-table-header-content" ref={headerDomRef}>
         <div style={{ minWidth: totalWidth, display: 'flex' }}>
-          {
-            !!leftLockColumns.length && (
-              <div className="mux-simple-table-header-lock-left">
-                {
-                  leftLockColumns.map((v, i) => {
-                    return (
-                      <div
-                        className="mux-simple-table-header-cell"
-                        style={Object.assign(
-                          {
-                            width: sizes.x[i]?.width,
-                            flexGrow: totalWidth < innerWidth ? 1 : 0,
-                          },
-                          v.lock && {
-                            position: 'sticky',
-                            left: 0,
-                          }
-                        )}
-                        key={i}
-                      >
-                        {v.title}
-                      </div>
-                    )
-                  })
-                }
-              </div>
-            )
-          }
           <div
             className="mux-simple-table-header"
             style={{ transform: `translateX(${translateX}px)` }}
           >
             {
+              leftLockColumns.filter(v => !xRenderList.includes(v)).map((v, i) => {
+                return (
+                  <div
+                    className="mux-simple-table-header-cell"
+                    style={Object.assign(
+                      {
+                        width: sizes.x[i]?.width,
+                        flexGrow,
+                      },
+                      v.lock && {
+                        position: 'sticky',
+                        left: 0,
+                        transform: `translateX(-${translateX}px)`
+                      }
+                    ) as CSSProperties}
+                    key={i}
+                  >
+                    {v.title}
+                  </div>
+                )
+              })
+            }
+            {
               xRenderList.map((v, i) => {
-                if (leftLockColumns.includes(v)) {
-                  return null
-                }
                 return (
                   <div
                     className="mux-simple-table-header-cell"
                     style={Object.assign(
                       {
                         width: sizes.x[xStartIndex + i]?.width,
-                        flexGrow: totalWidth < innerWidth ? 1 : 0,
+                        flexGrow,
                       },
                       v.lock && {
                         position: 'sticky',
                         left: 0,
                       }
-                    )}
+                    ) as CSSProperties}
                     key={xStartIndex + i}
                   >
                     {v.title}
@@ -381,7 +389,10 @@ export default function MuxSimpleTable(props: IProps) {
           }
           const scrollTop = (e.target as HTMLDivElement).scrollTop
 
-          bodyDomRef.current.scrollTop = scrollTop
+          if (bodyDomRef.current) {
+            bodyDomRef.current.scrollTop = scrollTop
+          }
+
           setYIndexHandler(scrollTop)
         }}
       >
@@ -398,8 +409,12 @@ export default function MuxSimpleTable(props: IProps) {
           }
           const scrollLeft = (e.target as HTMLDivElement).scrollLeft
 
-          bodyDomRef.current.scrollLeft = scrollLeft
-          headerDomRef.current.scrollLeft = scrollLeft
+          if (bodyDomRef.current) {
+            bodyDomRef.current.scrollLeft = scrollLeft
+          }
+          if (headerDomRef.current) {
+            headerDomRef.current.scrollLeft = scrollLeft
+          }
           setXIndexHandler(scrollLeft)
         }}
       >
