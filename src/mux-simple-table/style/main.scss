@@ -1,0 +1,61 @@
+.mux-simple-table {
+  border: 1px solid var(--color-border);
+  position: relative;
+}
+
+.mux-simple-table-header {
+  display: flex;
+}
+
+.mux-simple-table-header-content {
+  overflow-x: hidden;
+}
+
+.mux-simple-table-header-lock-left {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+
+.mux-simple-table-header-cell,
+.mux-simple-table-body-cell {
+  padding: 12px;
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  background: white;
+  &:last-child {
+    border-right: unset;
+  }
+}
+
+.mux-simple-table-body-content {
+  overflow-y: hidden;
+  overflow-anchor: none;
+}
+
+.mux-simple-table-body-row {
+  display: flex;
+}
+
+.mux-simple-table-body-cell {
+  height: 60px;
+}
+
+.mux-simple-table-right-scrollbar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 10px;
+  overflow: auto;
+}
+
+.mux-simple-table-bottom-scrollbar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 10px;
+  overflow: auto;
+}

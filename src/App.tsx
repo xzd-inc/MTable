@@ -1,11 +1,9 @@
-import MTable from './MTable'
+import Demo from './mux-simple-table/docs/0-basic'
 
-function App() {
+export default () => {
   return (
-    <div style={{ width: '100%', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <MTable />
+    <div style={{ width: 1300, marginLeft: 50 }}>
+      <Demo />
     </div>
   )
 }
-
-export default App

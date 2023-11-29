@@ -1,0 +1,133 @@
+:root {
+  /* 字体相关参数，输入或下拉框高度  */
+  --line-height: 1.5;
+  --font-size: 12px;
+  --font-family: PingFang SC, "Microsoft Yahei", "SimHei", sans-serif;
+  --font-number: Tahoma;
+  --font-color: #333;
+  --input-height: 32px;
+  --input-small-height: 24px;
+  --input-large-height: 40px;
+  --anchor-font-color: #333;
+
+  /* 品牌色 */
+  --color-brand: #4554E5;
+  --color-brand-gradient: #4554E5;
+  --color-brand-hover: #3325D4;
+  --color-brand-hover-gradient: #3325D4;
+  --color-brand-vs: #F5714D;
+  --color-brand-light: rgba(69, 84, 229, 0.2);
+  --color-brand-opacity: rgba(69, 84, 229, 0.1);
+  --color-brand-text: #ffffff;
+  --color-brand-text-hover: #ffffff;
+
+  /* 背景色 */
+  --color-bg: #F8F9FA;
+  --color-bg-hover: var(--color-brand-opacity);
+  --color-bg-active: var(--color-brand-opacity);
+
+  /* 边框 */
+  --color-border: #f0f2f5;
+  --border-radius: 8px;
+  --border-small-radius: 6px;
+  --border-large-radius: 10px;
+  --border-extra-large-radius: 12px;
+
+  /* trigger边框，背景色 */
+  --bg-highlight: #f0f2f5;
+  --border-highlight: #f0f2f5;
+  --border-highlight-shadow: none;
+  --bg-highlight-hover: #e4e7f0;
+  --border-highlight-hover: #e4e7f0;
+  --border-highlight-shadow-hover: none;
+  --bg-highlight-active: #fff;
+  --border-highlight-active-opacity: 0.5;
+  --border-highlight-active: rgba(69, 84, 229, var(--border-highlight-active-opacity));
+  --border-highlight-shadow-active-h: 0px;
+  --border-highlight-shadow-active-v: 2px;
+  --border-highlight-shadow-active-blur: 4px;
+  --border-highlight-shadow-active-opacity: 0.2;
+  --border-highlight-shadow-active: var(--border-highlight-shadow-active-h) var(--border-highlight-shadow-active-v) var(--border-highlight-shadow-active-blur) 0 rgba(69, 84, 229, var(--border-highlight-shadow-active-opacity));
+
+  /* 品牌按钮颜色 */
+  --btn-brand: var(--color-brand);
+  --btn-brand-gradient: var(--color-brand-gradient);
+  --btn-brand-shadow: none;
+  --btn-brand-text: var(--color-brand-text);
+  --btn-brand-hover: var(--color-brand-hover);
+  --btn-brand-gradient-hover: var(--color-brand-hover-gradient);
+  --btn-brand-shadow-hover: var(--color-brand-btn-shadow-hover);
+  --btn-brand-text-hover: var(--color-brand-text-hover);
+  --btn-brand-shadow-hover-h: 0px;
+  --btn-brand-shadow-hover-v: 2px;
+  --btn-brand-shadow-hover-blur: 10px;
+  --btn-brand-shadow-hover-opacity: 0.4;
+
+  /*次要按钮*/
+  --btn-border: #E6E6E7;
+  --btn-bg: #ffffff;
+  --btn-text: #333;
+  --btn-border-hover: rgba(69, 84, 229, 0.5);
+  --btn-bg-hover: rgba(69, 84, 229, 0.08);
+  --btn-text-hover: var(--color-brand);
+
+  /*不同尺寸*/
+  --btn-h-gap: 11px;
+  --btn-min-width: var(--input-min-width);
+  --btn-font-size: var(--font-size);
+  --btn-border-radius: 500px;
+  --btn-small-h-gap: 11px;
+  --btn-small-min-width: var(--input-small-min-width);
+  --btn-small-font-size: var(--input-small-font-size);
+  --btn-small-border-radius: 500px;
+  --btn-large-h-gap: 15px;
+  --btn-large-min-width: var(--input-large-min-width);
+  --btn-large-font-size: var(--input-large-font-size);
+  --btn-large-border-radius: 500px;
+
+  /* 项目相关颜色，app-brand和app-brand-gradient预留做品牌差异 */
+  --app-brand: var(--color-brand);
+  --app-brand-gradient: var(--color-brand-gradient);
+  --app-nav-bg: #303a58;
+  --app-bg: #f9f9f9;
+
+  /* 最小宽度定义 */
+  --app-min-width: 1415px;
+
+  /* 提示颜色 */
+  --color-warn: #FFA53D;
+  --color-red: #FF4D4D;
+  --color-green: #08BF81;
+  --color-blue: #6A76EA;
+
+  /* 动画 */
+  --duration: 0.2s;
+
+  /* 弹出卡片（dialog，grid等大展示卡片）：布局间距、边框、阴影（透明度及shadow定义）供微前端嵌入补充Magix侧变量 */
+  --output-v-gap: 16px;
+  --output-h-gap: 24px;
+  --output-border-radius: 16px;
+  --output-offset: 8px;
+  --output-item-height: 28px;
+  --output-small-v-gap: 8px;
+  --output-small-h-gap: 16px;
+  --output-small-border-radius: 8px;
+  --output-large-v-gap: 24px;
+  --output-large-h-gap: 24px;
+  --output-large-border-radius: 16px;
+
+  /* trigger（比如dropdown这类需要触发节点+下拉框） 配置，尺寸，颜色 供微前端嵌入补充Magix侧变量 */
+  --input-v-gap: 8px;
+  --input-h-gap: 8px;
+  --input-min-width: 64px;
+  --input-font-size: var(--font-size);
+  --input-small-v-gap: 8px;
+  --input-small-h-gap: 8px;
+  --input-small-min-width: 48px;
+  --input-small-font-size: var(--font-size);
+  --input-large-v-gap: 12px;
+  --input-large-h-gap: 12px;
+  --input-large-min-width: 88px;
+  --input-large-font-size: calc(var(--font-size) + 2px);
+  --input-gap-border: #e4e0e7;
+}

@@ -1,0 +1,8 @@
+import '../../style/index.scss'
+// import '../../mux-icon/style'
+// import '../../mux-loading/style'
+// import '../../mux-button/style'
+// import '../../mux-empty/style'
+// import '../../mux-checkbox/style'
+// import '../../mux-tooltip/style'
+import './main.scss'
