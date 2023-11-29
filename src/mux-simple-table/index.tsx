@@ -186,6 +186,8 @@ export default function MuxSimpleTable(props: IProps) {
 
   const hoverContentRef = useRef<'body' | 'scroll' | null>(null)
 
+  const HeaderLeftLockDomRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     if (!bodyDomRef.current) {
       return
@@ -224,6 +226,14 @@ export default function MuxSimpleTable(props: IProps) {
         if (bottomScrollbarDomRef.current) {
           bottomScrollbarDomRef.current.scrollTop = this.scrollLeft
         }
+
+        if (HeaderLeftLockDomRef.current) {
+          const left = this.scrollLeft - 300
+          HeaderLeftLockDomRef.current.style.left = left > 0 ? left + 'px' : 0
+        }
+
+        console.log(111, this.scrollLeft)
+
         if (lastScrollLeft !== this.scrollLeft) {
           setXIndexHandler(this.scrollLeft)
         }
@@ -267,33 +277,41 @@ export default function MuxSimpleTable(props: IProps) {
       {/* 表头 */}
       <div className="mux-simple-table-header-content" ref={headerDomRef}>
         <div style={{ minWidth: totalWidth, display: 'flex' }}>
+          {/* <div style={{ width: 20, height: 60, background: 'pink', position: 'sticky', left: 0, float: 'left' }}>
+
+          </div> */}
           <div
             className="mux-simple-table-header"
             style={{ transform: `translateX(${translateX}px)` }}
           >
-            {
-              leftLockColumns.filter(v => !xRenderList.includes(v)).map((v, i) => {
-                return (
-                  <div
-                    className="mux-simple-table-header-cell"
-                    style={Object.assign(
-                      {
-                        width: sizes.x[i]?.width,
-                        flexGrow,
-                      },
-                      v.lock && {
-                        position: 'sticky',
-                        left: 0,
-                        transform: `translateX(-${translateX}px)`
-                      }
-                    ) as CSSProperties}
-                    key={i}
-                  >
-                    {v.title}
-                  </div>
-                )
-              })
-            }
+            <div style={{ position: 'absolute', left: 0 }} ref={HeaderLeftLockDomRef}>
+              {
+                leftLockColumns.filter(v => !xRenderList.includes(v)).map((v, i) => {
+                  return (
+                    <div
+                      className="mux-simple-table-header-cell"
+                      style={Object.assign(
+                        {
+                          width: sizes.x[i]?.width,
+                          flexGrow,
+                        },
+                        v.lock && {
+                          position: 'sticky',
+                          // position: 'absolute',
+                          float: 'left',
+                          left: sizes.x[i]?.leftOffset,
+                          opacity: .8
+                          // transform: `translateX(-${translateX}px)`
+                        }
+                      ) as CSSProperties}
+                      key={i}
+                    >
+                      {v.title}
+                    </div>
+                  )
+                })
+              }
+            </div>
             {
               xRenderList.map((v, i) => {
                 return (
@@ -306,7 +324,8 @@ export default function MuxSimpleTable(props: IProps) {
                       },
                       v.lock && {
                         position: 'sticky',
-                        left: 0,
+                        opacity: .8,
+                        left: sizes.x[xStartIndex + i]?.leftOffset,
                       }
                     ) as CSSProperties}
                     key={xStartIndex + i}
@@ -316,7 +335,7 @@ export default function MuxSimpleTable(props: IProps) {
                 )
               })
             }
-          </div>
+          d</div>
         </div>
       </div>
       {/* 表体 */}
