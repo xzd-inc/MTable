@@ -18,7 +18,7 @@ export default ({ lock }) => {
     { title: '金额', dataIndex: 'money', width: 200, lock },
     { title: '时间', dataIndex: 'time', width: 300 },
     { title: '数字', dataIndex: 'number', width: 300 },
-    { title: '百分比', dataIndex: 'per', width: 400 },
+    { title: '百分比', dataIndex: 'per', width: 400, lock: 'right' },
   ]
 
   return (

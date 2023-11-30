@@ -322,7 +322,7 @@ export default function MuxSimpleTable(props: IProps) {
                 )
               })
             }
-            {/* 不锁定的列 */}
+            {/* 不锁列 */}
             {
               xRenderList.map((v, i) => {
                 return (
@@ -379,8 +379,6 @@ export default function MuxSimpleTable(props: IProps) {
             style={{
               height: totalHeight,
               minWidth: totalWidth,
-              position: 'relative',
-              overflow: 'hidden',
             }}
           >
             <div
@@ -396,6 +394,26 @@ export default function MuxSimpleTable(props: IProps) {
                       className='mux-simple-table-body-row'
                       key={yStartIndex + i}
                     >
+                      {/* 左锁列 */}
+                      {
+                        leftLockColumns.map((k, j) => {
+                          return (
+                            <div
+                              className="mux-simple-table-body-cell"
+                              key={`${j}-${yStartIndex + i}`}
+                              style={{
+                                width: k.width,
+                                flexGrow,
+                                position: 'sticky',
+                                left: -translateX + sizes.leftLock[j]?.leftOffset || 0,
+                              }}
+                            >
+                              {get(v, k.dataIndex)}
+                            </div>
+                          )
+                        })
+                      }
+                      {/* 不锁列 */}
                       {
                         xRenderList.map((k, j) => {
                           return (
@@ -406,6 +424,25 @@ export default function MuxSimpleTable(props: IProps) {
                                 flexGrow: totalWidth < innerWidth ? 1 : 0,
                               }}
                               key={`${xStartIndex + j}-${yStartIndex + i}`}
+                            >
+                              {get(v, k.dataIndex)}
+                            </div>
+                          )
+                        })
+                      }
+                      {/* 右锁列 */}
+                      {
+                        rightLockColumns.map((k, j) => {
+                          return (
+                            <div
+                              className="mux-simple-table-body-cell"
+                              key={`${j}-${yStartIndex + i}`}
+                              style={{
+                                width: k.width,
+                                flexGrow,
+                                position: 'sticky',
+                                right: translateX + sizes.rightLock[j]?.rightOffset || 0,
+                              }}
                             >
                               {get(v, k.dataIndex)}
                             </div>
