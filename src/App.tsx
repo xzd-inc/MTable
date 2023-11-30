@@ -4,7 +4,7 @@ export default () => {
   return (
     <div style={{ width: 1300, marginLeft: 50 }}>
       <Demo lock="left" />
-      <Demo />
+      {/* <Demo /> */}
     </div>
   )
 }

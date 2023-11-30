@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState, CSSProperties } from 'react'
+import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ResizeObserver from 'rc-resize-observer'
 import get from 'lodash/get'
 
@@ -20,15 +20,17 @@ export interface IProps {
 interface ISize {
   x: Array<{ width: number, span: number, leftOffset: number, rightOffset: number }>
   y: Array<{ height: number, span: number, topOffset: number, bottomOffset: number }>
+  leftLock: ISize['x']
+  rightLock: ISize['x']
 }
 
 export default function MuxSimpleTable(props: IProps) {
   const { bodyHeight, columns, dataSource } = props
 
-  const { innerColumns, leftLockColumns, rightLockColumns } = useMemo(() => {
+  const { notLockColumns, leftLockColumns, rightLockColumns } = useMemo(() => {
     const leftLockColumns = []
     const rightLockColumns = []
-    const others = []
+    const notLockColumns = []
     for (let i = 0; i < columns.length; i++) {
       const column = columns[i]
       if (column.lock === 'left') {
@@ -36,43 +38,55 @@ export default function MuxSimpleTable(props: IProps) {
       } else if (column.lock === 'right') {
         rightLockColumns.push(column)
       } else {
-        others.push(column)
+        notLockColumns.push(column)
       }
     }
     return {
-      innerColumns: [...leftLockColumns, ...others, ...rightLockColumns],
       leftLockColumns,
       rightLockColumns,
+      notLockColumns,
     }
   }, [columns])
 
   const [{ innerHeight, innerWidth }, setInnerSize] = useState({ innerHeight: 0, innerWidth: 0 })
 
-  const [sizes, setSizes] = useState<ISize>({ x: [], y: [] })
+  const [sizes, setSizes] = useState<ISize>({ x: [], y: [], leftLock: [], rightLock: [] })
 
   useEffect(() => {
     const x = Array.from(
-      { length: innerColumns?.length || 0 },
+      { length: notLockColumns?.length || 0 },
+      () => ({ width: 0, leftOffset: 0, rightOffset: 0, span: 1 })
+    )
+    const leftLock = Array.from(
+      { length: leftLockColumns?.length || 0 },
+      () => ({ width: 0, leftOffset: 0, rightOffset: 0, span: 1 })
+    )
+    const rightLock = Array.from(
+      { length: rightLockColumns?.length || 0 },
       () => ({ width: 0, leftOffset: 0, rightOffset: 0, span: 1 })
     )
 
-    let leftOffset = 0
-    let rightOffset = 0
+    function setX(x: ISize['x'], columns: IColumn[]) {
+      let leftOffset = 0
+      let rightOffset = 0
 
-    const xWidths = innerColumns.map(v => v.width)
-
-    for (let i = 0; i < xWidths.length; i++) {
-      const cur = xWidths[i]
-      const lastCur = xWidths[xWidths.length - i - 1]
-
-      x[i].width = cur
-      x[i].leftOffset = leftOffset
-      x[xWidths.length - i - 1].rightOffset = rightOffset
-      x[i].span = 1
-
-      leftOffset += cur
-      rightOffset += lastCur
+      for (let i = 0; i < columns.length; i++) {
+        const cur = columns[i]
+        const lastCur = columns[columns.length - i - 1]
+  
+        x[i].width = cur.width
+        x[i].leftOffset = leftOffset
+        x[columns.length - i - 1].rightOffset = rightOffset
+        x[i].span = 1
+  
+        leftOffset += cur.width
+        rightOffset += lastCur.width
+      }
     }
+
+    setX(x, notLockColumns)
+    setX(leftLock, leftLockColumns)
+    setX(rightLock, rightLockColumns)
 
     const y = Array.from(
       { length: dataSource.length },
@@ -91,8 +105,8 @@ export default function MuxSimpleTable(props: IProps) {
       bottomOffset += 60
     }
 
-    setSizes({ x, y })
-  }, [innerColumns, dataSource.length, innerWidth])
+    setSizes({ x, y, leftLock, rightLock })
+  }, [notLockColumns, dataSource.length, innerWidth])
 
   const [{ yStartIndex, yEndIndex }, setYIndex] = useState({ yStartIndex: 0, yEndIndex: 0 })
   const [{ xStartIndex, xEndIndex }, setXIndex] = useState({ xStartIndex: 0, xEndIndex: 0 })
@@ -186,8 +200,6 @@ export default function MuxSimpleTable(props: IProps) {
 
   const hoverContentRef = useRef<'body' | 'scroll' | null>(null)
 
-  const HeaderLeftLockDomRef = useRef<HTMLDivElement>(null)
-
   useEffect(() => {
     if (!bodyDomRef.current) {
       return
@@ -227,13 +239,6 @@ export default function MuxSimpleTable(props: IProps) {
           bottomScrollbarDomRef.current.scrollTop = this.scrollLeft
         }
 
-        if (HeaderLeftLockDomRef.current) {
-          const left = this.scrollLeft - 300
-          HeaderLeftLockDomRef.current.style.left = left > 0 ? left + 'px' : 0
-        }
-
-        console.log(111, this.scrollLeft)
-
         if (lastScrollLeft !== this.scrollLeft) {
           setXIndexHandler(this.scrollLeft)
         }
@@ -254,8 +259,25 @@ export default function MuxSimpleTable(props: IProps) {
   }, [sizes])
 
   const totalWidth = useMemo(() => {
-    const lastSize = sizes.x[sizes.x.length - 1]
-    return lastSize?.leftOffset + lastSize?.width || 0
+    let leftLockWidth = 0
+    const lastLeftLock = sizes.leftLock[sizes.leftLock.length - 1]
+    if (lastLeftLock) {
+      leftLockWidth = lastLeftLock.leftOffset + lastLeftLock.width
+    }
+
+    let rightLockWidth = 0
+    const lastRightLock = sizes.rightLock[sizes.rightLock.length - 1]
+    if (lastRightLock) {
+      rightLockWidth = lastRightLock.leftOffset + lastRightLock.width
+    }
+
+    let notLockWidth = 0
+    const lastNotLock = sizes.x[sizes.x.length - 1]
+    if (lastNotLock) {
+      notLockWidth = lastNotLock.leftOffset + lastNotLock.width
+    }
+
+    return leftLockWidth + rightLockWidth + notLockWidth
   }, [sizes])
 
   const yRenderList = useMemo(() => {
@@ -263,8 +285,8 @@ export default function MuxSimpleTable(props: IProps) {
   }, [dataSource, yStartIndex, yEndIndex])
 
   const xRenderList = useMemo(() => {
-    return innerColumns.slice(xStartIndex, xEndIndex + 1)
-  }, [innerColumns, xStartIndex, xEndIndex])
+    return notLockColumns.slice(xStartIndex, xEndIndex + 1)
+  }, [notLockColumns, xStartIndex, xEndIndex])
 
   const translateX = useMemo(() => {
     return sizes.x[xStartIndex]?.leftOffset || 0
@@ -277,57 +299,39 @@ export default function MuxSimpleTable(props: IProps) {
       {/* 表头 */}
       <div className="mux-simple-table-header-content" ref={headerDomRef}>
         <div style={{ minWidth: totalWidth, display: 'flex' }}>
-          {/* <div style={{ width: 20, height: 60, background: 'pink', position: 'sticky', left: 0, float: 'left' }}>
-
-          </div> */}
           <div
             className="mux-simple-table-header"
             style={{ transform: `translateX(${translateX}px)` }}
           >
-            <div style={{ position: 'absolute', left: 0 }} ref={HeaderLeftLockDomRef}>
-              {
-                leftLockColumns.filter(v => !xRenderList.includes(v)).map((v, i) => {
-                  return (
-                    <div
-                      className="mux-simple-table-header-cell"
-                      style={Object.assign(
-                        {
-                          width: sizes.x[i]?.width,
-                          flexGrow,
-                        },
-                        v.lock && {
-                          position: 'sticky',
-                          // position: 'absolute',
-                          float: 'left',
-                          left: sizes.x[i]?.leftOffset,
-                          opacity: .8
-                          // transform: `translateX(-${translateX}px)`
-                        }
-                      ) as CSSProperties}
-                      key={i}
-                    >
-                      {v.title}
-                    </div>
-                  )
-                })
-              }
-            </div>
+            {/* 左锁列 */}
+            {
+              leftLockColumns.map((v, i) => {
+                return (
+                  <div
+                    className="mux-simple-table-header-cell"
+                    key={i}
+                    style={{
+                      width: v.width,
+                      flexGrow,
+                      position: 'sticky',
+                      left: -translateX + sizes.leftLock[i]?.leftOffset || 0,
+                    }}
+                  >
+                    {v.title}
+                  </div>
+                )
+              })
+            }
+            {/* 不锁定的列 */}
             {
               xRenderList.map((v, i) => {
                 return (
                   <div
                     className="mux-simple-table-header-cell"
-                    style={Object.assign(
-                      {
-                        width: sizes.x[xStartIndex + i]?.width,
-                        flexGrow,
-                      },
-                      v.lock && {
-                        position: 'sticky',
-                        opacity: .8,
-                        left: sizes.x[xStartIndex + i]?.leftOffset,
-                      }
-                    ) as CSSProperties}
+                    style={{
+                      width: sizes.x[xStartIndex + i]?.width,
+                      flexGrow,
+                    }}
                     key={xStartIndex + i}
                   >
                     {v.title}
@@ -335,7 +339,26 @@ export default function MuxSimpleTable(props: IProps) {
                 )
               })
             }
-          d</div>
+            {/* 右锁列 */}
+            {
+              rightLockColumns.map((v, i) => {
+                return (
+                  <div
+                    className="mux-simple-table-header-cell"
+                    key={i}
+                    style={{
+                      width: v.width,
+                      flexGrow,
+                      position: 'sticky',
+                      right: translateX + sizes.rightLock[i]?.rightOffset || 0,
+                    }}
+                  >
+                    {v.title}
+                  </div>
+                )
+              })
+            }
+          </div>
         </div>
       </div>
       {/* 表体 */}
