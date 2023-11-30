@@ -1,6 +1,16 @@
 .mux-simple-table {
   border: 1px solid var(--color-border);
   position: relative;
+
+  // ::-webkit-scrollbar {
+  //   height: 8px;
+  //   border-radius: 4px;
+  //   background-color: #eee;
+  // }
+  // ::-webkit-scrollbar-track,
+  // ::-webkit-scrollbar-thumb {
+  //   border-radius: 4px;
+  // }
 }
 
 .mux-simple-table-header {
@@ -48,7 +58,7 @@
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 10px;
+  width: 16px;
   overflow: auto;
 }
 
@@ -56,6 +66,6 @@
   position: absolute;
   left: 0;
   bottom: 0;
-  height: 10px;
+  height: 16px;
   overflow: auto;
 }

@@ -2,7 +2,7 @@
 import React from 'react'
 import MuxSimpleTable from '..'
 
-const dataSource = Array.from({ length: 10 }).map((v, i) => {
+const dataSource = Array.from({ length: 1000 }).map((v, i) => {
   return {
     id: '用户 ID：' + i,
     money: '金额：' + Math.floor(Math.random() * 10000),
