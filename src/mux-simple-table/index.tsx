@@ -13,9 +13,18 @@ interface IColumn {
 }
 
 export interface IProps {
-  bodyHeight: number
+  /** 表格配置项 */
   columns: IColumn[]
-  dataSource: any[]
+  /** 数据源 */
+  dataSource: object[]
+  /** 表体高度，以 px 为单位，默认 500 */
+  bodyHeight: number
+  /** 是否为树形表格 */
+  isTree?: boolean
+  /** 表格每行的唯一标识，默认 id */
+  primaryKey?: string
+  /** 展示树形数据时，每层缩进的宽度，以 px 为单位，默认15 */
+  indentSize?: number
 }
 
 interface ISize {
@@ -26,7 +35,27 @@ interface ISize {
 }
 
 export default function MuxSimpleTable(props: IProps) {
-  const { bodyHeight, columns, dataSource } = props
+  const { bodyHeight = 500, columns, dataSource, isTree, primaryKey = 'id', indentSize = 15 } = props
+
+  const [expandedRowKeys, setExpandedRowKeys] = useState<Array<string | number>>([1])
+
+  const { innerDataSource, treeMap } = useMemo(() => {
+    if (!isTree || !dataSource?.length || !expandedRowKeys?.length) return { innerDataSource: dataSource, treeMap: {} }
+    const innerDataSource: any[] = []
+    const treeMap: Record<string | number, { parentKeys: Array<string | number>, depth: number }> = {}
+
+    function dfs(dataSource: object[], parentKeys: Array<string | number>, depth: number) {
+      dataSource.forEach(v => {
+        innerDataSource.push(v)
+        treeMap[(v as any)[primaryKey]] = { parentKeys, depth }
+        if (expandedRowKeys.includes((v as any)[primaryKey]) && (v as any).children?.length) {
+          dfs((v as any).children, [ ...parentKeys, (v as any)[primaryKey]], depth + 1)
+        }
+      })
+    }
+    dfs(dataSource, [], 0)
+    return { innerDataSource, treeMap }
+  }, [dataSource, isTree, expandedRowKeys, primaryKey])
 
   const { notLockColumns, leftLockColumns, rightLockColumns } = useMemo(() => {
     const leftLockColumns = []
@@ -90,16 +119,16 @@ export default function MuxSimpleTable(props: IProps) {
     setX(rightLock, rightLockColumns)
 
     const y = Array.from(
-      { length: dataSource.length },
+      { length: innerDataSource.length },
       () => ({ height: 60, span: 1, topOffset: 0, bottomOffset: 0 })
     )
 
     let topOffset = 0
     let bottomOffset = 0
-    for (let i = 0; i < dataSource.length; i++) {
+    for (let i = 0; i < innerDataSource.length; i++) {
       y[i].height = 60
       y[i].topOffset = topOffset
-      y[dataSource.length - i - 1].bottomOffset = bottomOffset
+      y[innerDataSource.length - i - 1].bottomOffset = bottomOffset
       y[i].span = 1
 
       topOffset += 60
@@ -107,7 +136,7 @@ export default function MuxSimpleTable(props: IProps) {
     }
 
     setSizes({ x, y, leftLock, rightLock })
-  }, [notLockColumns, dataSource.length, innerWidth])
+  }, [notLockColumns, innerDataSource.length, innerWidth])
 
   const [{ yStartIndex, yEndIndex }, setYIndex] = useState({ yStartIndex: 0, yEndIndex: 0 })
   const [{ xStartIndex, xEndIndex }, setXIndex] = useState({ xStartIndex: 0, xEndIndex: 0 })
@@ -282,8 +311,8 @@ export default function MuxSimpleTable(props: IProps) {
   }, [sizes])
 
   const yRenderList = useMemo(() => {
-    return dataSource.slice(yStartIndex, yEndIndex + 1)
-  }, [dataSource, yStartIndex, yEndIndex])
+    return innerDataSource.slice(yStartIndex, yEndIndex + 1)
+  }, [innerDataSource, yStartIndex, yEndIndex])
 
   const xRenderList = useMemo(() => {
     return notLockColumns.slice(xStartIndex, xEndIndex + 1)
@@ -409,6 +438,30 @@ export default function MuxSimpleTable(props: IProps) {
                                 left: -translateX + sizes.leftLock[j]?.leftOffset || 0,
                               }}
                             >
+                              {
+                                isTree && j === 0 && (
+                                  <div
+                                    className="mux-simple-table-expanded"
+                                    style={{
+                                      visibility: (v as any).children?.length ? 'visible' : 'hidden',
+                                      marginLeft: (treeMap[v[primaryKey]]?.depth * indentSize) || 0
+                                    }}
+                                    onClick={() => {
+                                      // 收起来
+                                      if (expandedRowKeys.includes((v as any)[primaryKey])) {
+                                        const newExpandedRowKeys = expandedRowKeys.filter(k => {
+                                          return v[primaryKey] !== k && !treeMap[k].parentKeys.includes(v[primaryKey])
+                                        })
+                                        setExpandedRowKeys(newExpandedRowKeys)
+                                      } else {
+                                        setExpandedRowKeys(prev => [...prev, v[primaryKey]])
+                                      }
+                                    }}
+                                  >
+
+                                  </div>
+                                )
+                              }
                               {get(v, k.dataIndex)}
                             </div>
                           )

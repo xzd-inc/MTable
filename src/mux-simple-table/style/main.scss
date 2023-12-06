@@ -80,6 +80,14 @@
   transition: box-shadow .3s
 }
 
+.mux-simple-table-expanded {
+  display: inline-block;
+  width: 20px;
+  margin-right: 15px;
+  height: 100%;
+  background: pink;
+}
+
 .mux-simple-table-right-scrollbar {
   position: absolute;
   right: 0;
