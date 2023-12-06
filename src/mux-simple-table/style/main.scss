@@ -51,7 +51,7 @@
 }
 
 .mux-simple-table-body-cell {
-  height: 60px;
+  height: var(--row-height);
 }
 
 .mux-simple-table-left-lock-last:after {

@@ -2,32 +2,32 @@
 import React from 'react'
 import MuxSimpleTable from '..'
 
-// const dataSource = Array.from({ length: 1000 }).map((v, i) => {
-//   return {
-//     id: '用户 ID：' + i,
-//     money: '金额：' + Math.floor(Math.random() * 10000),
-//     time: '时间：' + Date.now() + i,
-//     number: '数字：' + Math.round(Math.random() * 10000),
-//     per: '百分比：' + i * 10,
-//   }
-// })
+const dataSource = Array.from({ length: 1000000 }).map((v, i) => {
+  return {
+    id: '用户 ID：' + i,
+    money: '金额：' + Math.floor(Math.random() * 10000),
+    time: '时间：' + Date.now() + i,
+    number: '数字：' + Math.round(Math.random() * 10000),
+    per: '百分比：' + i * 10,
+  }
+})
 
-const dataSource = [
-  {
-    id: 1, money: 1, time: 1, number: 1, per: 1,
-    children: [
-      { id: 3, money: 3, time: 3, number: 3, per: 3 },
-      {
-        id: 4, money: 4, time: 4, number: 4, per: 4,
-        children: [
-          { id: 5, money: 5, time: 5, number: 5, per: 5 },
-          { id: 6, money: 6, time: 6, number: 6, per: 6 },
-        ]
-      },
-    ]
-  },
-  { id: 2, money: 2, time: 2, number: 2, per: 2 },
-]
+// const dataSource = [
+//   {
+//     id: 1, money: 1, time: 1, number: 1, per: 1,
+//     children: [
+//       { id: 3, money: 3, time: 3, number: 3, per: 3 },
+//       {
+//         id: 4, money: 4, time: 4, number: 4, per: 4,
+//         children: [
+//           { id: 5, money: 5, time: 5, number: 5, per: 5 },
+//           { id: 6, money: 6, time: 6, number: 6, per: 6 },
+//         ]
+//       },
+//     ]
+//   },
+//   { id: 2, money: 2, time: 2, number: 2, per: 2 },
+// ]
 
 export default ({ lock }) => {
   const columns = [
@@ -42,6 +42,7 @@ export default ({ lock }) => {
     <MuxSimpleTable
       isTree={true}
       bodyHeight={300}
+      rowHeight={60}
       columns={columns}
       dataSource={dataSource}
     />

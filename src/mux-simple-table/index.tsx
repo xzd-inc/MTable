@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { CSSProperties, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ResizeObserver from 'rc-resize-observer'
 import get from 'lodash/get'
 import isEqual from 'lodash/isEqual'
@@ -20,6 +20,8 @@ export interface IProps {
   dataSource: object[]
   /** 表体高度，以 px 为单位，默认 500 */
   bodyHeight: number
+  /** 每行的高度，默认值 60px */
+  rowHeight?: number
   /** 是否为树形表格 */
   isTree?: boolean
   /** 表格每行的唯一标识，默认 id */
@@ -42,7 +44,7 @@ interface ISize {
 }
 
 export default function MuxSimpleTable(props: IProps) {
-  const { bodyHeight = 500, columns, dataSource, isTree, primaryKey = 'id', indentSize = 15, onExpanded } = props
+  const { bodyHeight = 500, rowHeight = 60, columns, dataSource, isTree, primaryKey = 'id', indentSize = 15, onExpanded } = props
 
   const [expandedRowKeys, setExpandedRowKeys] = useState<Array<string | number>>(props.defalutExpandedRowKeys || props.expandedRowKeys || [])
 
@@ -96,6 +98,7 @@ export default function MuxSimpleTable(props: IProps) {
   const [sizes, setSizes] = useState<ISize>({ x: [], y: [], leftLock: [], rightLock: [] })
 
   useEffect(() => {
+    console.time()
     const x = Array.from(
       { length: notLockColumns?.length || 0 },
       () => ({ width: 0, leftOffset: 0, rightOffset: 0, span: 1 })
@@ -133,20 +136,22 @@ export default function MuxSimpleTable(props: IProps) {
 
     const y = Array.from(
       { length: innerDataSource.length },
-      () => ({ height: 60, span: 1, topOffset: 0, bottomOffset: 0 })
+      () => ({ height: rowHeight, span: 1, topOffset: 0, bottomOffset: 0 })
     )
 
     let topOffset = 0
     let bottomOffset = 0
     for (let i = 0; i < innerDataSource.length; i++) {
-      y[i].height = 60
+      y[i].height = rowHeight
       y[i].topOffset = topOffset
       y[innerDataSource.length - i - 1].bottomOffset = bottomOffset
       y[i].span = 1
 
-      topOffset += 60
-      bottomOffset += 60
+      topOffset += rowHeight
+      bottomOffset += rowHeight
     }
+
+    console.timeEnd()
 
     setSizes({ x, y, leftLock, rightLock })
   }, [notLockColumns, innerDataSource.length, innerWidth])
@@ -338,7 +343,7 @@ export default function MuxSimpleTable(props: IProps) {
   const flexGrow = totalWidth < innerWidth ? 1 : 0
 
   return (
-    <div className="mux-simple-table">
+    <div className="mux-simple-table" style={{ '--row-height': rowHeight + 'px' } as CSSProperties}>
       {/* 表头 */}
       <div className="mux-simple-table-header-content" ref={headerDomRef}>
         <div style={{ minWidth: totalWidth, display: 'flex' }}>
