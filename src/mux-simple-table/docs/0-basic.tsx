@@ -21,6 +21,7 @@ const dataSource = [
         id: 4, money: 4, time: 4, number: 4, per: 4,
         children: [
           { id: 5, money: 5, time: 5, number: 5, per: 5 },
+          { id: 6, money: 6, time: 6, number: 6, per: 6 },
         ]
       },
     ]

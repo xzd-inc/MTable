@@ -1,6 +1,7 @@
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ResizeObserver from 'rc-resize-observer'
 import get from 'lodash/get'
+import isEqual from 'lodash/isEqual'
 import classNames from 'classnames'
 
 import './style/main.scss'
@@ -25,6 +26,12 @@ export interface IProps {
   primaryKey?: string
   /** 展示树形数据时，每层缩进的宽度，以 px 为单位，默认15 */
   indentSize?: number
+  /** 树形表格时的展开项，传递时为受控模式 */
+  expandedRowKeys?: Array<string | number>
+  /** 树形表格时的默认展开项，非受控，仅在初次渲染时生效 */
+  defalutExpandedRowKeys?: Array<string | number>
+  /** 树形表格展开时候的回调函数 */
+  onExpanded?: (expandedRowKeys: IProps['expandedRowKeys'], row: IProps['dataSource'][number]) => void
 }
 
 interface ISize {
@@ -35,9 +42,15 @@ interface ISize {
 }
 
 export default function MuxSimpleTable(props: IProps) {
-  const { bodyHeight = 500, columns, dataSource, isTree, primaryKey = 'id', indentSize = 15 } = props
+  const { bodyHeight = 500, columns, dataSource, isTree, primaryKey = 'id', indentSize = 15, onExpanded } = props
 
-  const [expandedRowKeys, setExpandedRowKeys] = useState<Array<string | number>>([1])
+  const [expandedRowKeys, setExpandedRowKeys] = useState<Array<string | number>>(props.defalutExpandedRowKeys || props.expandedRowKeys || [])
+
+  useEffect(() => {
+    if (props.expandedRowKeys && !isEqual(props.expandedRowKeys, expandedRowKeys)) {
+      setExpandedRowKeys(props.expandedRowKeys)
+    }
+  }, [props.expandedRowKeys])
 
   const { innerDataSource, treeMap } = useMemo(() => {
     if (!isTree || !dataSource?.length || !expandedRowKeys?.length) return { innerDataSource: dataSource, treeMap: {} }
@@ -448,13 +461,18 @@ export default function MuxSimpleTable(props: IProps) {
                                     }}
                                     onClick={() => {
                                       // 收起来
+                                      let newExpandedRowKeys
                                       if (expandedRowKeys.includes((v as any)[primaryKey])) {
-                                        const newExpandedRowKeys = expandedRowKeys.filter(k => {
+                                        newExpandedRowKeys = expandedRowKeys.filter(k => {
                                           return v[primaryKey] !== k && !treeMap[k].parentKeys.includes(v[primaryKey])
                                         })
-                                        setExpandedRowKeys(newExpandedRowKeys)
                                       } else {
-                                        setExpandedRowKeys(prev => [...prev, v[primaryKey]])
+                                        newExpandedRowKeys = [...expandedRowKeys, v[primaryKey]]
+                                      }
+                                      if (props.expandedRowKeys) {
+                                        onExpanded?.(newExpandedRowKeys, v)
+                                      } else {
+                                        setExpandedRowKeys(newExpandedRowKeys)
                                       }
                                     }}
                                   >
