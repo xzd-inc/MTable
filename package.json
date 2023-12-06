@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "classnames": "^2.3.2",
     "lodash": "^4.17.21",
     "rc-resize-observer": "^1.4.0",
     "react": "^16.14.0",

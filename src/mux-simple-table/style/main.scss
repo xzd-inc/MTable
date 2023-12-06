@@ -54,6 +54,32 @@
   height: 60px;
 }
 
+.mux-simple-table-left-lock-last:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  transform: translateX(100%);
+  width: 30px;
+  pointer-events: none;
+  box-shadow: inset 10px 0 8px -8px rgba(0,0,0,.15);
+  transition: box-shadow .3s
+}
+
+.mux-simple-table-right-lock-first::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  pointer-events: none;
+  left: 0;
+  transform: translateX(-100%);
+  box-shadow: inset -10px 0 8px -8px rgba(0,0,0,.15);
+  transition: box-shadow .3s
+}
+
 .mux-simple-table-right-scrollbar {
   position: absolute;
   right: 0;

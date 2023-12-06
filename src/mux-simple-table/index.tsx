@@ -1,6 +1,7 @@
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ResizeObserver from 'rc-resize-observer'
 import get from 'lodash/get'
+import classNames from 'classnames'
 
 import './style/main.scss'
 
@@ -308,7 +309,7 @@ export default function MuxSimpleTable(props: IProps) {
               leftLockColumns.map((v, i) => {
                 return (
                   <div
-                    className="mux-simple-table-header-cell"
+                    className={classNames('mux-simple-table-header-cell', { 'mux-simple-table-left-lock-last': i === leftLockColumns?.length - 1 })}
                     key={i}
                     style={{
                       width: v.width,
@@ -344,7 +345,7 @@ export default function MuxSimpleTable(props: IProps) {
               rightLockColumns.map((v, i) => {
                 return (
                   <div
-                    className="mux-simple-table-header-cell"
+                    className={classNames('mux-simple-table-header-cell', { 'mux-simple-table-right-lock-first': i === 0 })}
                     key={i}
                     style={{
                       width: v.width,
@@ -399,7 +400,7 @@ export default function MuxSimpleTable(props: IProps) {
                         leftLockColumns.map((k, j) => {
                           return (
                             <div
-                              className="mux-simple-table-body-cell"
+                            className={classNames('mux-simple-table-body-cell', { 'mux-simple-table-left-lock-last': j === leftLockColumns?.length - 1 })}
                               key={`${j}-${yStartIndex + i}`}
                               style={{
                                 width: k.width,
@@ -435,7 +436,7 @@ export default function MuxSimpleTable(props: IProps) {
                         rightLockColumns.map((k, j) => {
                           return (
                             <div
-                              className="mux-simple-table-body-cell"
+                              className={classNames('mux-simple-table-body-cell', { 'mux-simple-table-right-lock-first': j === 0 })}
                               key={`${j}-${yStartIndex + i}`}
                               style={{
                                 width: k.width,
